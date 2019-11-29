@@ -1,32 +1,38 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import SeasonDisplay from "./SeasonDisplay";
+import Spinner from "./Spinner";
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
+  state = { lat: null, errorMessage: "" };
 
-    this.state = { lat: null, errorMessage: '' };
-
+  componentDidMount() {
     window.navigator.geolocation.getCurrentPosition(
       position => {
-          // To update the state object!
-          this.setState({ lat: position.coords.latitude });
+        // To update the state object!
+        this.setState({ lat: position.coords.latitude });
       },
       err => {
-          this.setState({ errorMessage: err.message });
+        this.setState({ errorMessage: err.message });
       }
     );
   }
-  render() {
+
+  // Helper method to handle the conditional cases in the render function.
+  renderHelper() {
     if (!this.state.errorMessage && this.state.lat) {
-        return <div>Latitude: {this.state.lat }</div>;
+      return <SeasonDisplay lat={this.state.lat} />;
     }
 
     if (this.state.errorMessage && !this.state.lat) {
-        return <div>Error: {this.state.errorMessage}</div>;
+      return <div>Error: {this.state.errorMessage}</div>;
     }
 
-    return <div>Loading...</div>;
+    return <Spinner text="Give location access to see something cool!" />;
+  }
+
+  render() {
+    return <div className="outline">{this.renderHelper()}</div>;
   }
 }
 
